@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>Numerical Solver - Customizable</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+
+<h1>Numerical Analysis Methods</h1>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('bisection', this)">Bisection</button>
+  <button class="tab" onclick="show('falsepos', this)">False Position</button>
+  <button class="tab" onclick="show('newton', this)">Newton</button>
+  <button class="tab" onclick="show('fixedpt', this)">Fixed Point</button>
+  <button class="tab" onclick="show('secant', this)">Secant</button>
+  <button class="tab" onclick="show('gaussianelim', this)">Gaussian Elimination</button>
+  <button class="tab" onclick="show('gaussjordan', this)">Gauss Jordan </button>
+  <button class="tab" onclick="show('ludecomp', this)">LU Decomposition</button>
+  <button class="tab" onclick="show('cramer', this)">Cramer Rule</button>
+</div>
+
+<div class="box">
+  <div id="bisection" class="page active">
+    <h3>Bisection Method</h3>
+    <div class="input-group"><label>f(x)</label><input id="b-fx" placeholder="e.g. 4*x^3 - 6*x^2 + 7*x - 2.3" /></div>
+    <div style="display: flex; gap: 10px;">
+      <div class="input-group" style="flex:1"><label>xl (Lower)</label><input id="b-xl" type="number" step="any" /></div>
+      <div class="input-group" style="flex:1"><label>xu (Upper)</label><input id="b-xu" type="number" step="any" /></div>
+    </div>
+    <div class="input-group"><label>Tolerance (Error %)</label><input id="b-tol" type="number" step="any" value="1" /></div>
+    <button class="solve" onclick="runBisection()">Solve Method</button>
+    <div id="b-out"></div>
+  </div>
+
+  <div id="falsepos" class="page">
+    <h3>False Position Method</h3>
+    <div class="input-group"><label>f(x)</label><input id="f-fx" placeholder="e.g. 4*x^3 - 6*x^2 + 7*x - 2.3" /></div>
+    <div style="display: flex; gap: 10px;">
+      <div class="input-group" style="flex:1"><label>xl (Lower)</label><input id="f-xl" type="number" step="any" /></div>
+      <div class="input-group" style="flex:1"><label>xu (Upper)</label><input id="f-xu" type="number" step="any" /></div>
+    </div>
+    <div class="input-group"><label>Tolerance (Error %)</label><input id="f-tol" type="number" step="any" value="1" /></div>
+    <button class="solve" onclick="runFalsePos()">Solve Method</button>
+    <div id="f-out"></div>
+  </div>
+
+  <div id="newton" class="page">
+    <h3>Newton-Raphson Method</h3>
+    <div class="input-group"><label>f(x)</label><input id="n-fx" /></div>
+    <div class="input-group"><label>f'(x) Derivative</label><input id="n-dfx" /></div>
+    <div class="input-group"><label>x0 (Initial Guess)</label><input id="n-x0" type="number" step="any" /></div>
+    <div class="input-group"><label>Tolerance (Error %)</label><input id="n-tol" type="number" step="any" /></div>
+    <button class="solve" onclick="runNewton()">Solve Method</button>
+    <div id="n-out"></div>
+  </div>
+
+  <div id="fixedpt" class="page">
+    <h3>Simple Fixed Point</h3>
+    <div class="input-group"><label>f(x) (required)</label><input id="fp-fx" placeholder="e.g. -x^2 + 1.8*x + 2.5" /></div>
+    <div class="input-group"><label>g(x) auto-generated from f(x)</label><input id="fp-gx" placeholder="e.g. sqrt(1.8*x + 2.5)" readonly /></div>
+    <p class="fp-hint">Truth table: each row shows <strong>x<sub>i</sub></strong>, then <strong>F(x<sub>i</sub>)</strong> = value used as <strong>x<sub>i+1</sub></strong>. &nbsp;ε% = |x<sub>i</sub> − x<sub>i−1</sub>| / |x<sub>i</sub>| × 100 (blank for i = 0).</p>
+    <div class="input-group"><label>x0 (Initial Guess)</label><input id="fp-x0" type="number" step="any" /></div>
+    <div class="input-group"><label>Tolerance (Error %)</label><input id="fp-tol" type="number" step="any" /></div>
+    <button class="solve" onclick="runFixedPoint()">Solve Method</button>
+    <div id="fp-out"></div>
+  </div>
+
+  <div id="secant" class="page">
+    <h3>Secant Method</h3>
+    <div class="input-group"><label>f(x)</label><input id="s-fx" /></div>
+    <div style="display: flex; gap: 10px;">
+      <div class="input-group" style="flex:1"><label>x-1</label><input id="s-xm1" type="number" step="any" /></div>
+      <div class="input-group" style="flex:1"><label>x0</label><input id="s-x0" type="number" step="any" /></div>
+    </div>
+    <div class="input-group"><label>Tolerance (Error %)</label><input id="s-tol" type="number" step="any" /></div>
+    <button class="solve" onclick="runSecant()">Solve Method</button>
+    <div id="s-out"></div>
+  </div>
+
+  <div id="gaussianelim" class="page">
+    <h3>Gaussian Elimination Method</h3>
+    <div class="matrix-card">
+      <div class="matrix-header">
+        <label for="ge-size">Matrix Input</label>
+        <div class="matrix-size-wrap">
+          <span>Size:</span>
+          <select id="ge-size" onchange="renderMatrixInputs('ge')">
+            <option value="2">2x2</option>
+            <option value="3" selected>3x3</option>
+            <option value="4">4x4</option>
+          </select>
+        </div>
+      </div>
+      <div id="ge-grid" class="matrix-grid"></div>
+    </div>
+    <button class="solve" onclick="runGaussianElimination()">Solve Method</button>
+    <div id="ge-out"></div>
+  </div>
+
+  <div id="gaussjordan" class="page">
+    <h3>Gauss Jordan Method</h3>
+    <div class="matrix-card">
+      <div class="matrix-header">
+        <label for="gj-size">Matrix Input</label>
+        <div class="matrix-size-wrap">
+          <span>Size:</span>
+          <select id="gj-size" onchange="renderMatrixInputs('gj')">
+            <option value="2">2x2</option>
+            <option value="3" selected>3x3</option>
+            <option value="4">4x4</option>
+          </select>
+        </div>
+      </div>
+      <div id="gj-grid" class="matrix-grid"></div>
+    </div>
+    <button class="solve" onclick="runGaussJordan()">Solve Method</button>
+    <div id="gj-out"></div>
+  </div>
+
+  <div id="ludecomp" class="page">
+    <h3>LU Decomposition Method</h3>
+    <div class="matrix-card">
+      <div class="matrix-header">
+        <label for="lu-size">Matrix Input</label>
+        <div class="matrix-size-wrap">
+          <span>Size:</span>
+          <select id="lu-size" onchange="renderMatrixInputs('lu')">
+            <option value="2">2x2</option>
+            <option value="3" selected>3x3</option>
+            <option value="4">4x4</option>
+          </select>
+        </div>
+      </div>
+      <div id="lu-grid" class="matrix-grid"></div>
+    </div>
+    <button class="solve" onclick="runLUDecomposition()">Solve Method</button>
+    <div id="lu-out"></div>
+  </div>
+
+  <div id="cramer" class="page">
+    <h3>Cramer Rule Method</h3>
+    <div class="matrix-card">
+      <div class="matrix-header">
+        <label for="cr-size">Matrix Input</label>
+        <div class="matrix-size-wrap">
+          <span>Size:</span>
+          <select id="cr-size" onchange="renderMatrixInputs('cr')">
+            <option value="2">2x2</option>
+            <option value="3" selected>3x3</option>
+            <option value="4">4x4</option>
+          </select>
+        </div>
+      </div>
+      <div id="cr-grid" class="matrix-grid"></div>
+    </div>
+    <button class="solve" onclick="runCramerRule()">Solve Method</button>
+    <div id="cr-out"></div>
+  </div>
+</div>
+
+<script src="./assets/js/app.js"></script>
+
+</body>
+</html>
